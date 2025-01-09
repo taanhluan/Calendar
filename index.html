@@ -180,63 +180,72 @@
     <p>&copy; 2025 Content Calendar App</p>
   </footer>
 
-  <script>
-    // JavaScript for managing the calendar and WFH schedules
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('schedule-form');
-      const calendar = document.getElementById('calendar');
+<script>
+  // JavaScript for managing the calendar and WFH schedules
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('schedule-form');
+    const calendar = document.getElementById('calendar');
 
-      // Array to store WFH events
-      const events = [];
+    // Load events from localStorage or initialize an empty array
+    const events = JSON.parse(localStorage.getItem('wfhEvents')) || [];
 
-      // Add event listener to form
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // Save events to localStorage
+    function saveToLocalStorage() {
+      localStorage.setItem('wfhEvents', JSON.stringify(events));
+    }
 
-        // Get form values
-        const name = document.getElementById('name').value;
-        const date = document.getElementById('date').value;
+    // Add event listener to form
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-        // Add event to the array
-        events.push({ name, date });
+      // Get form values
+      const name = document.getElementById('name').value;
+      const date = document.getElementById('date').value;
 
-        // Update calendar display
-        renderCalendar();
+      // Add event to the array
+      events.push({ name, date });
 
-        // Clear form inputs
-        form.reset();
-      });
+      // Save to localStorage
+      saveToLocalStorage();
 
-      // Function to render calendar
-      function renderCalendar() {
-        calendar.innerHTML = '<h2>WFH Calendar</h2>';
-        
-        if (events.length === 0) {
-          calendar.innerHTML += '<p>No WFH schedules added yet.</p>';
-          return;
-        }
+      // Update calendar display
+      renderCalendar();
 
-        // Display each event
-        events.forEach((event, index) => {
-          const eventDiv = document.createElement('div');
-          eventDiv.classList.add('event');
-          eventDiv.innerHTML = `
-            <p><strong>${event.date}</strong>: ${event.name}</p>
-            <button onclick="deleteEvent(${index})">Delete</button>
-          `;
-          calendar.appendChild(eventDiv);
-        });
+      // Clear form inputs
+      form.reset();
+    });
+
+    // Function to render calendar
+    function renderCalendar() {
+      calendar.innerHTML = '<h2>WFH Calendar</h2>';
+      
+      if (events.length === 0) {
+        calendar.innerHTML += '<p>No WFH schedules added yet.</p>';
+        return;
       }
 
-      // Function to delete an event
-      window.deleteEvent = function (index) {
-        events.splice(index, 1); // Remove event
-        renderCalendar(); // Update calendar
-      };
+      // Display each event
+      events.forEach((event, index) => {
+        const eventDiv = document.createElement('div');
+        eventDiv.classList.add('event');
+        eventDiv.innerHTML = `
+          <p><strong>${event.date}</strong>: ${event.name}</p>
+          <button onclick="deleteEvent(${index})">Delete</button>
+        `;
+        calendar.appendChild(eventDiv);
+      });
+    }
 
-      // Initial render
-      renderCalendar();
-    });
-  </script>
+    // Function to delete an event
+    window.deleteEvent = function (index) {
+      events.splice(index, 1); // Remove event
+      saveToLocalStorage(); // Save updated events
+      renderCalendar(); // Update calendar
+    };
+
+    // Initial render
+    renderCalendar();
+  });
+</script>
 </body>
 </html>
